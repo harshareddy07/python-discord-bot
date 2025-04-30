@@ -33,12 +33,12 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# $hello
+# $hello - use this command
 @bot.command()
 async def hello(context):
     await context.send(f"Hello {context.author.mention}!!!")
 
-# $assign
+# $assign - use this command
 @bot.command()
 async def assign(ctx):
     role = discord.utils.get(ctx.guild.roles, name=server_role)
@@ -56,6 +56,34 @@ async def removed(ctx):
         await ctx.send(f"{ctx.author.mention}'s role which is {server_role} is removed")
     else:
         await ctx.send("Role doesn't exist")
+
+# $dm hello - this command for sending msg in dm
+@bot.command()
+async def dm(ctx, *, msg):
+    await ctx.author.send(f"You said {msg}")
+    
+# $reply hello - this command for replying msg in sever
+@bot.command()
+async def reply(ctx):
+    await ctx.reply("This is a reply to your message!")
+
+# $poll is this server good - command for poll
+@bot.command()
+async def poll(ctx, *, question):
+    embed = discord.Embed(title="New Poll", description=question)
+    poll_message = await ctx.send(embed=embed)
+    await poll_message.add_reaction("👍")
+    await poll_message.add_reaction("👎")
+
+@bot.command()
+@commands.has_role(server_role)
+async def secret(ctx):
+    await ctx.send("Welcome to the club!")
+
+@secret.error
+async def secret_error(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("You do not have permission to do that!")
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
